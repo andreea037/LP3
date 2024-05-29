@@ -17,12 +17,13 @@ def add_to_calculation(symbol):
 def evaluate_calculation():
     global calculation
     try:
+        # Evaluate the calculation
         calculation = str(eval(calculation, {"__builtins__": None}, {
             "sin": lambda x: math.sin(math.radians(x)),
             "cos": lambda x: math.cos(math.radians(x)),
             "tan": lambda x: math.tan(math.radians(x)),
-            "cot": lambda x: 1 / math.tan(math.radians(x)),
-            "log": math.log10,
+            "cot": lambda x: 1/math.tan(math.radians(x)),
+            "log": math.log10,  # Change to log base 10 for standard logarithm
             "sqrt": math.sqrt
         }))
         text_result.delete(1.0, "end")
@@ -78,40 +79,32 @@ def plot_graph():
     plt.legend()
     plt.show()
 
-root = tk.Tk()
-root.geometry("500x700")
+root = tk.Tk()  # Generate the user interface
+root.geometry("600x800")
 root.title("Complex Calculator")
 
-text_result = tk.Text(root, height=2, width=22, font=("Helvetica", 24), bg="#f0f0f0", fg="#333")
-text_result.grid(columnspan=5)
-
-button_font = ("Helvetica", 14)
-button_bg = "#ffffff"
-button_fg = "#333333"
-operation_bg = "#ffcccc"
-function_bg = "#ccffcc"
-clear_bg = "#ffcc99"
-equal_bg = "#ccff99"
+text_result = tk.Text(root, height=2, width=16, font=("Arial", 24))
+text_result.grid(columnspan=6)
 
 # Numeric buttons
 buttons = [
-    ('1', 2, 0), ('2', 2, 1), ('3', 2, 2),
-    ('4', 3, 0), ('5', 3, 1), ('6', 3, 2),
-    ('7', 4, 0), ('8', 4, 1), ('9', 4, 2), ('0', 5, 1)
+    ('1', 2, 1), ('2', 2, 2), ('3', 2, 3),
+    ('4', 3, 1), ('5', 3, 2), ('6', 3, 3),
+    ('7', 4, 1), ('8', 4, 2), ('9', 4, 3), ('0', 5, 2)
 ]
 
 for (text, row, col) in buttons:
-    tk.Button(root, text=text, command=lambda t=text: add_to_calculation(t), width=5, font=button_font, bg=button_bg, fg=button_fg).grid(row=row, column=col)
+    tk.Button(root, text=text, command=lambda t=text: add_to_calculation(t), width=5, font=("Arial", 14)).grid(row=row, column=col)
 
 # Operation buttons
 operations = [
-    ('+', 2, 3), ('-', 3, 3),
-    ('*', 4, 3), ('/', 5, 3),
-    ('(', 5, 0), (')', 5, 2)
+    ('+', 2, 4), ('-', 3, 4),
+    ('*', 4, 4), ('/', 5, 4),
+    ('(', 5, 1), (')', 5, 3)
 ]
 
 for (text, row, col) in operations:
-    tk.Button(root, text=text, command=lambda t=text: add_to_calculation(t), width=5, font=button_font, bg=operation_bg, fg=button_fg).grid(row=row, column=col)
+    tk.Button(root, text=text, command=lambda t=text: add_to_calculation(t), width=5, font=("Arial", 14)).grid(row=row, column=col)
 
 # Function buttons
 functions = [
@@ -120,16 +113,16 @@ functions = [
 ]
 
 for i, (text, symbol) in enumerate(functions):
-    tk.Button(root, text=text, command=lambda s=symbol: add_to_calculation(s), width=5, font=button_font, bg=function_bg, fg=button_fg).grid(row=i+2, column=4)
+        tk.Button(root, text=text, command=lambda s=symbol: add_to_calculation(s), width=5, font=("Arial", 14)).grid(row=i+2, column=5)
 
 # Additional buttons
-tk.Button(root, text='a', command=set_a_value, width=5, font=button_font, bg=function_bg, fg=button_fg).grid(row=6, column=0)
-tk.Button(root, text='b', command=set_b_value, width=5, font=button_font, bg=function_bg, fg=button_fg).grid(row=6, column=1)
-tk.Button(root, text='c', command=set_c_value, width=5, font=button_font, bg=function_bg, fg=button_fg).grid(row=6, column=2)
-tk.Button(root, text='Plot', command=plot_graph, width=11, font=button_font, bg=function_bg, fg=button_fg).grid(row=6, column=3, columnspan=1)
+tk.Button(root, text='a', command=set_a_value, width=5, font=("Arial", 14)).grid(row=7, column=1, columnspan=1)
+tk.Button(root, text='b', command=set_b_value, width=5, font=("Arial", 14)).grid(row=7, column=2, columnspan=1)
+tk.Button(root, text='c', command=set_c_value, width=5, font=("Arial", 14)).grid(row=7, column=3, columnspan=1)
+tk.Button(root, text='Plot', command=plot_graph, width=5, font=("Arial", 14)).grid(row=7, column=4, columnspan=1)
 
 # Clear and equal buttons
-tk.Button(root, text='C', command=clear_field, width=11, font=button_font, bg=clear_bg, fg=button_fg).grid(row=7, column=2, columnspan=2)
-tk.Button(root, text='=', command=evaluate_calculation, width=11, font=button_font, bg=equal_bg, fg=button_fg).grid(row=7, column=0, columnspan=1)
+tk.Button(root, text='C', command=clear_field, width=11, font=("Arial", 14)).grid(row=8, column=3, columnspan=2)
+tk.Button(root, text='=', command=evaluate_calculation, width=11, font=("Arial", 14)).grid(row=8, column=1, columnspan=2)
 
-root.mainloop()
+root.mainloop()  # This method listens for events, such as button clicks or keypresses and blocks any code that comes after it from running until you close the window.
