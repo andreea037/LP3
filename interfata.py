@@ -1,92 +1,130 @@
 import tkinter as tk
+import math
+import matplotlib.pyplot as plt
+import numpy as np
 
 calculation = ""
+a_value = 0
+b_value = 0
+c_value = 0
 
-def add_to_calculation(symbol):
+def add_to_calculation(symbol): #adauga in text valorile de pe butoane
     global calculation
-    calculation +=str(symbol)
-    text_result.delete(1.0, "end")
-    text_result.insert(1.0, calculation)
+    calculation += str(symbol) # transforma toate simbolurile in string pentru a nu se face calculul direct
+    text_result.delete(1.0, "end") #sterge textul dupa ce se apasa =
+    text_result.insert(1.0, calculation) #insereaza valorile
+
 
 def evaluate_calculation():
     global calculation
     try:
-        calculation = str(eval(calculation))
+        # evalueaza calculul
+        calculation = str(eval(calculation, {"__builtins__": None}, {
+            "sin": lambda x: math.sin(math.radians(x)),
+            "cos": lambda x: math.cos(math.radians(x)),
+            "tan": lambda x: math.tan(math.radians(x)),
+            "cot": lambda x: 1/math.tan(math.radians(x)),
+            "log": math.log10,  # Change to log base 10 for standard logarithm
+            "sqrt": math.sqrt
+        }))
         text_result.delete(1.0, "end")
         text_result.insert(1.0, calculation)
     except:
         clear_field()
-        text_result.insert(1.0, "Error")
+        text_result.insert(1.0, "Error") # genereaza un msj de eroare daca nu este bun calculul
 
 def clear_field():
     global calculation
     calculation = ""
     text_result.delete(1.0, "end")
 
-root = tk.Tk() #genereaza interfata cu utilizatorul
-root.geometry("300x300")
-root.title("Calculator")
+def set_a_value():
+    global a_value
+    try:
+        a_value = float(calculation)
+        clear_field()
+        text_result.insert(1.0, f"a = {a_value}")
+    except:
+        clear_field()
+        text_result.insert(1.0, "Invalid a")
 
-text_result = tk.Text(root, height = 2, width = 16, font = ("Arial", 24))
-text_result.grid(columnspan=5)
+def set_b_value():
+    global b_value
+    try:
+        b_value = float(calculation)
+        clear_field()
+        text_result.insert(1.0, f"b = {b_value}")
+    except:
+        clear_field()
+        text_result.insert(1.0, "Invalid b")
 
-b1 = tk.Button(root, text='1', command=lambda: add_to_calculation(1), width=5, font=("Arial", 14))
-b1.grid(row = 2, column = 1)
+def set_c_value():
+    global c_value
+    try:
+        c_value = float(calculation)
+        clear_field()
+        text_result.insert(1.0, f"c = {c_value}")
+    except:
+        clear_field()
+        text_result.insert(1.0, "Invalid c")
 
-b2 = tk.Button(root, text='2', command=lambda: add_to_calculation(2), width=5, font=("Arial", 14))
-b2.grid(row = 2, column = 2)
+def plot_graph():
+    global a_value, b_value, c_value
+    x = np.linspace(-10, 10, 400)
+    y = a_value * x**2 + b_value * x + c_value
+    plt.figure()
+    plt.plot(x, y, label=f'{a_value}x^2 + {b_value}x + {c_value} = 0')
+    plt.axhline(0, color='black', linewidth=0.5)
+    plt.axvline(0, color='black', linewidth=0.5)
+    plt.grid(color='gray', linestyle='--', linewidth=0.5)
+    plt.legend()
+    plt.show()
 
-b3 = tk.Button(root, text='3', command=lambda: add_to_calculation(3), width=5, font=("Arial", 14))
-b3.grid(row = 2, column = 3)
+root = tk.Tk()  # #genereaza interfata cu utilizatorul
+root.geometry("600x800") #dimensiunile
+root.title("Calculator") #titlul
 
-b4 = tk.Button(root, text='4', command=lambda: add_to_calculation(4), width=5, font=("Arial", 14))
-b4.grid(row = 3, column = 1)
+text_result = tk.Text(root, height=2, width=18, font=("Arial", 24)) #genereaza textul scris
+text_result.grid(columnspan=6) #dimensiunile
 
-b5 = tk.Button(root, text='5', command=lambda: add_to_calculation(5), width=5, font=("Arial", 14))
-b5.grid(row = 3, column = 2)
+# butoane pentru cifre
+buttons = [
+    ('1', 2, 1), ('2', 2, 2), ('3', 2, 3),
+    ('4', 3, 1), ('5', 3, 2), ('6', 3, 3),
+    ('7', 4, 1), ('8', 4, 2), ('9', 4, 3), ('0', 5, 2)
+]
 
-b6 = tk.Button(root, text='6', command=lambda: add_to_calculation(6), width=5, font=("Arial", 14))
-b6.grid(row = 3, column = 3)
+for (text, row, col) in buttons:
+    tk.Button(root, text=text, command=lambda t=text: add_to_calculation(t), width=5, font=("Arial", 14), bg="#d1e7dd", fg="black").grid(row=row, column=col)
+    # functie lambda pt ca doar adauga simboluri, nu le calculeaza direct
+# butoanele pentru operatii simple
+operations = [
+    ('+', 2, 4), ('-', 3, 4),
+    ('*', 4, 4), ('/', 5, 4),
+    ('(', 5, 1), (')', 5, 3)
+]
 
-b7 = tk.Button(root, text='7', command=lambda: add_to_calculation(7), width=5, font=("Arial", 14))
-b7.grid(row = 4, column = 1)
+for (text, row, col) in operations:
+    tk.Button(root, text=text, command=lambda t=text: add_to_calculation(t), width=5, font=("Arial", 14), bg="#f8d7da", fg="black").grid(row=row, column=col)
 
-b8 = tk.Button(root, text='8', command=lambda: add_to_calculation(8), width=5, font=("Arial", 14))
-b8.grid(row = 4, column = 2)
+# butoane pentru functiile complexe
+functions = [
+    ('sin', 'sin('), ('cos', 'cos('), ('tan', 'tan('), ('cot', 'cot('),
+    ('log', 'log('), ('√', 'sqrt(')
+]
 
-b9 = tk.Button(root, text='9', command=lambda: add_to_calculation(9), width=5, font=("Arial", 14))
-b9.grid(row = 4, column = 3)
+for i, (text, symbol) in enumerate(functions):
+        tk.Button(root, text=text, command=lambda s=symbol: add_to_calculation(s), width=5, font=("Arial", 14), bg="#cff4fc", fg="black").grid(row=i+2, column=5)
 
-b0 = tk.Button(root, text='0', command=lambda: add_to_calculation(0), width=5, font=("Arial", 14))
-b0.grid(row = 5, column = 2)
+# butoane aditionale
+tk.Button(root, text='a', command=set_a_value, width=5, font=("Arial", 14), bg="#e2e3e5", fg="black").grid(row=6, column=1, columnspan=1)
+tk.Button(root, text='b', command=set_b_value, width=5, font=("Arial", 14), bg="#e2e3e5", fg="black").grid(row=6, column=2, columnspan=1)
+tk.Button(root, text='c', command=set_c_value, width=5, font=("Arial", 14), bg="#e2e3e5", fg="black").grid(row=6, column=3, columnspan=1)
+tk.Button(root, text='Plot', command=plot_graph, width=5, font=("Arial", 14), bg="#d1e7dd", fg="black").grid(row=6, column=4, columnspan=1)
 
-bPlus = tk.Button(root, text='+', command=lambda: add_to_calculation("+"), width=5, font=("Arial", 14))
-bPlus.grid(row = 2, column = 4)
+# butoane pentru stergere si egal
+tk.Button(root, text='C', command=clear_field, width=11, font=("Arial", 14), bg="#f8d7da", fg="black").grid(row=7, column=3, columnspan=2)
+tk.Button(root, text='=', command=evaluate_calculation, width=11, font=("Arial", 14), bg="#d1e7dd", fg="black").grid(row=7, column=1, columnspan=2)
 
-bMinus = tk.Button(root, text='-', command=lambda: add_to_calculation("-"), width=5, font=("Arial", 14))
-bMinus.grid(row = 3, column = 4)
-
-bMult = tk.Button(root, text='*', command=lambda: add_to_calculation("*"), width=5, font=("Arial", 14))
-bMult.grid(row = 4, column = 4)
-
-bDiv = tk.Button(root, text='/', command=lambda: add_to_calculation("/"), width=5, font=("Arial", 14))
-bDiv.grid(row = 5, column = 4)
-
-bPar1 = tk.Button(root, text='(', command=lambda: add_to_calculation("("), width=5, font=("Arial", 14))
-bPar1.grid(row = 5, column = 1)
-
-bPar2 = tk.Button(root, text=')', command=lambda: add_to_calculation(")"), width=5, font=("Arial", 14))
-bPar2.grid(row = 5, column = 3)
-
-bSterge = tk.Button(root, text='C', command=clear_field, width=11, font=("Arial", 14))
-bSterge.grid(row = 6, column = 3, columnspan=2)
-
-bEgal = tk.Button(root, text='=', command=evaluate_calculation, width=11, font=("Arial", 14))
-bEgal.grid(row = 6, column = 1, columnspan=2)
-
-root.mainloop() #this method listens for events, such as button clicks or keypresses
-                #and blocks any code that comes after it from running until you close the window
-
-
-
-
+root.mainloop()  #metoda "asculta" evenimente, cum ar fi apasarea butoanelor
+                #si blocheaza orice cod ce apare dupa el din a rula pana inchidem feresatra
